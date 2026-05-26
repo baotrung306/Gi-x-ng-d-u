@@ -225,15 +225,6 @@
     border-color: var(--accent);
     box-shadow: 0 0 0 4px rgba(249,115,22,0.1);
   }
-  .input-label {
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 10px;
-    display: block;
-  }
   .input-row {
     display: flex;
     align-items: center;
@@ -673,7 +664,7 @@ const FUELS = [
   { id:'mazut',         label:'Dầu Mazut 180CST 3.5S',   icon:'⚙️', color:'#64748b', rgb:'100,116,139',  default:20587, unit:'kg'  },
 ];
 
-// Fallback tĩnh phòng trường hợp mất mạng
+// Fallback tĩnh phòng trường hợp mất mạng (Vẫn render đầy đủ tab so sánh)
 const FALLBACK = {
   current_date: "21/05/2026",
   prev_date:    "14/05/2026",
@@ -698,14 +689,14 @@ let autoRefreshTimer = null;
 window.addEventListener('DOMContentLoaded', () => {
   buildFuelGrid();
   buildPriceTable();
-  renderCompare();
+  applyToAllTabs(); // Chạy ngay lập tức với dữ liệu cục bộ trước để tránh kẹt màn hình trắng
   fetchAll();
   setupAutoRefresh();
   setupPWA();
 });
 
 // ─────────────────────────────────────────────
-//  FETCH DỮ LIỆU LỊCH SỬ TỪ API PHÂN PHỐI ĐA KỲ
+//  FETCH LỊCH SỬ THỜI GIAN QUA PROXY MIỄN PHÍ
 // ─────────────────────────────────────────────
 async function fetchAll() {
   if (isLoading) return;
@@ -718,10 +709,10 @@ async function fetchAll() {
   btn.disabled = true;
   icon.className = 'spin';
   status.className = 'update-status loading';
-  status.textContent = '⏳ Đang đồng bộ lịch sử điều chỉnh...';
+  status.textContent = '⏳ Đang đồng bộ chuỗi lịch sử điều chỉnh...';
 
   try {
-    // Gọi API lưu trữ chuỗi thời gian phân phối của Petrolimex qua Proxy
+    // Gọi API lưu trữ dữ liệu lịch sử mảng đa kỳ của Petrolimex qua Proxy AllOrigins công khai
     const apiUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://webgia.com/api/xang-dau-lich-su.json');
     const response = await fetch(apiUrl);
     if (!response.ok) throw new Error('API Error');
@@ -729,12 +720,12 @@ async function fetchAll() {
     const wrapper = await response.json();
     const historyData = JSON.parse(wrapper.contents);
     
-    // Đảm bảo API trả về mảng danh sách lịch sử chứa ít nhất 2 phần tử gần nhất
+    // Đảm bảo API trả về mảng danh sách lịch sử chứa ít nhất 2 kỳ liên tiếp
     if (historyData && historyData.length >= 2) {
-      const kyMoiNhat = historyData[0]; // Ví dụ: Kỳ 21/05
-      const kyLienKe  = historyData[1]; // Ví dụ: Kỳ 14/05
+      const kyMoiNhat = historyData[0]; // Kỳ mới nhất (Ví dụ: 21/05)
+      const kyLienKe  = historyData[1]; // Kỳ trước đó (Ví dụ: 14/05)
       
-      // 1. Gán dữ liệu cho KỲ NÀY (Hiện tại)
+      // 1. Đồng bộ động dữ liệu KỲ NÀY (Hiện tại)
       appData.current_date = kyMoiNhat.date;
       appData.current.e5_ron92 = parseInt(kyMoiNhat.vung1.e5);
       appData.current.ron95_iii = parseInt(kyMoiNhat.vung1.ron95_3);
@@ -743,11 +734,11 @@ async function fetchAll() {
       appData.current.diesel_001 = parseInt(kyMoiNhat.vung1.do_001);
       appData.current.kerosene = parseInt(kyMoiNhat.vung1.dau_hoa);
       appData.current.mazut = parseInt(kyMoiNhat.vung1.mazut);
-      // Tính toán tỉ lệ dòng sinh học E10 kì hiện tại
+      // Tự động tính tỷ lệ dòng E10 kỳ mới nhất dựa vào cơ sở gốc nếu API trống
       appData.current.e10_ron95_iii = parseInt(kyMoiNhat.vung1.e10_3) || (appData.current.ron95_iii - 620);
       appData.current.e10_ron95_v = parseInt(kyMoiNhat.vung1.e10_5) || (appData.current.ron95_v - 300);
 
-      // 2. Gán dữ liệu cho KỲ TRƯỚC GẦN NHẤT
+      // 2. Đồng bộ động dữ liệu KỲ TRƯỚC (Quá khứ liền kề) - GIẢI QUYẾT TRIỆT ĐỂ LỖI BỊ KẸT NGÀY CŨ
       appData.prev_date = kyLienKe.date;
       appData.prev.e5_ron92 = parseInt(kyLienKe.vung1.e5);
       appData.prev.ron95_iii = parseInt(kyLienKe.vung1.ron95_3);
@@ -756,20 +747,20 @@ async function fetchAll() {
       appData.prev.diesel_001 = parseInt(kyLienKe.vung1.do_001);
       appData.prev.kerosene = parseInt(kyLienKe.vung1.dau_hoa);
       appData.prev.mazut = parseInt(kyLienKe.vung1.mazut);
-      // Tính toán tỉ lệ dòng sinh học E10 kì trước
       appData.prev.e10_ron95_iii = parseInt(kyLienKe.vung1.e10_3) || (appData.prev.ron95_iii - 620);
       appData.prev.e10_ron95_v = parseInt(kyLienKe.vung1.e10_5) || (appData.prev.ron95_v - 300);
 
       status.className = 'update-status ok';
-      status.textContent = `✅ Cập nhật tự động: ${appData.current_date}`;
+      status.textContent = `✅ Đồng bộ trực tuyến: ${appData.current_date}`;
     } else {
-      throw new Error('Cấu trúc dữ liệu mảng lịch sử bị lỗi.');
+      throw new Error('Cấu trúc danh sách mảng lịch sử bị lỗi.');
     }
   } catch (error) {
     console.warn("Lỗi API, chạy chế độ Offline cục bộ:", error);
     status.className = 'update-status warn';
-    status.textContent = `⚠️ Offline - So sánh kỳ ${appData.prev_date} → ${appData.current_date}`;
+    status.textContent = `⚠️ Ngoại tuyến - So sánh kỳ ${appData.prev_date} → ${appData.current_date}`;
   } finally {
+    // Gọi hàm này ở khối FINALLY để dù thành công hay thất bại, tab so sánh vẫn được vẽ lại đẹp mắt
     applyToAllTabs();
     icon.className = '';
     icon.textContent = '🔄';
@@ -949,10 +940,54 @@ function renderCompare() {
 
   const trendIcon = totalUp > totalDown ? '📈' : totalDown > totalUp ? '📉' : '➡️';
   const trendText = totalUp > totalDown
-    ? `<strong>Kỳ này xu hướng tăng</strong> — phần lớn các mặt hàng điều chỉnh đi lên.`
+    ? `<strong>Kỳ này chi phí tăng lên</strong> — phần lớn các nhóm nhiên liệu đều được điều chỉnh tăng.`
     : totalDown > totalUp
-    ? `<strong>Kỳ này xu hướng giảm</strong> — hạ nhiệt chi phí vận hành, đi lại.`
-    : `<strong>Giá bình ổn</strong> — không biến động nhiều so với tuần trước.`;
+    ? `<strong>Kỳ này chi phí giảm xuống</strong> — hỗ trợ hạ nhiệt áp lực chi phí đi lại và vận tải.`
+    : `<strong>Giá bình ổn</strong> — giữ nguyên trạng so với chu kỳ liền kề trước đó.`;
 
   el.innerHTML = `
-    <div class="compare-
+    <div class="compare-header">
+      <div class="compare-period">📅 Kỳ trước: ${d.prev_date}</div>
+      <div class="compare-arrow">→</div>
+      <div class="compare-period" style="border-color:rgba(249,115,22,0.3);color:var(--accent)">📅 Kỳ này: ${d.current_date}</div>
+    </div>
+    <div class="compare-summary">
+      <div class="compare-summary-icon">${trendIcon}</div>
+      <div class="compare-summary-text">${trendText}</div>
+    </div>
+    ${rows}
+  `;
+}
+
+function fmt(n) { return new Intl.NumberFormat('vi-VN').format(Math.round(n)); }
+function fmtVND(n) { return fmt(n) + ' đ'; }
+
+let deferredPrompt = null;
+function setupPWA() {
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBanner').style.display = 'flex';
+  });
+  document.getElementById('btnInstall').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') document.getElementById('installBanner').style.display = 'none';
+    deferredPrompt = null;
+  });
+}
+
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE='xang-v5';
+    const ASSETS=['/'];
+    self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
+    self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+}
+</script>
+</body>
+</html>
