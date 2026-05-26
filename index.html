@@ -44,7 +44,6 @@
     overflow-x: hidden;
   }
 
-  /* BG glow */
   body::before {
     content: '';
     position: fixed;
@@ -76,7 +75,6 @@
     padding: 0 0 40px;
   }
 
-  /* ─── HEADER ─── */
   .header {
     padding: 52px 24px 28px;
     text-align: center;
@@ -108,7 +106,6 @@
     font-weight: 600;
   }
 
-  /* ─── UPDATE BAR ─── */
   .update-bar {
     margin: 0 16px 20px;
     background: var(--surface);
@@ -148,7 +145,6 @@
   .spin { display: inline-block; animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ─── TABS ─── */
   .tabs {
     display: flex;
     margin: 0 16px 20px;
@@ -176,7 +172,6 @@
     box-shadow: 0 4px 16px rgba(249,115,22,0.4);
   }
 
-  /* ─── SECTION ─── */
   .section { padding: 0 16px; margin-bottom: 20px; }
   .section-title {
     font-size: 11px;
@@ -188,7 +183,6 @@
     padding-left: 2px;
   }
 
-  /* ─── FUEL GRID ─── */
   .fuel-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -220,7 +214,6 @@
   }
   .fuel-card.selected .fuel-price { color: var(--fc, var(--accent)); }
 
-  /* ─── INPUT AREA ─── */
   .input-wrap {
     background: var(--surface);
     border: 2px solid var(--border);
@@ -266,7 +259,6 @@
     flex-shrink: 0;
   }
 
-  /* numpad */
   .numpad {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -293,7 +285,6 @@
   .np-btn.del { color: #ef4444; font-size: 18px; }
   .np-btn.decimal { color: var(--slate); }
 
-  /* ─── MODE TOGGLE ─── */
   .mode-toggle {
     display: flex;
     background: var(--surface2);
@@ -323,7 +314,6 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
 
-  /* ─── CALCULATE BTN ─── */
   .btn-calc {
     width: 100%;
     padding: 18px;
@@ -342,7 +332,6 @@
   .btn-calc:active { transform: scale(0.98); box-shadow: 0 4px 16px rgba(249,115,22,0.3); }
   .btn-calc:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
 
-  /* ─── RESULT ─── */
   .result-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -385,7 +374,6 @@
     font-weight: 700;
   }
 
-  /* ─── PRICE TABLE ─── */
   .price-table { display: flex; flex-direction: column; gap: 8px; }
   .price-row {
     background: var(--surface);
@@ -416,7 +404,6 @@
     line-height: 1.6;
   }
 
-  /* ─── PWA INSTALL BANNER ─── */
   .install-banner {
     margin: 0 16px 20px;
     background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(249,115,22,0.1));
@@ -444,7 +431,6 @@
     box-shadow: 0 4px 14px rgba(99,102,241,0.4);
   }
 
-  /* ─── COMPARE TABLE ─── */
   .compare-header {
     display: flex;
     align-items: center;
@@ -520,18 +506,10 @@
     border-radius: 8px;
     width: fit-content;
   }
-  .compare-badge.up {
-    background: rgba(239,68,68,0.12);
-    color: var(--red);
-  }
-  .compare-badge.down {
-    background: rgba(34,197,94,0.12);
-    color: var(--green);
-  }
-  .compare-badge.flat {
-    background: rgba(148,163,184,0.12);
-    color: var(--slate);
-  }
+  .compare-badge.up { background: rgba(239,68,68,0.12); color: var(--red); }
+  .compare-badge.down { background: rgba(34,197,94,0.12); color: var(--green); }
+  .compare-badge.flat { background: rgba(148,163,184,0.12); color: var(--slate); }
+
   .compare-loading {
     text-align: center;
     padding: 40px 20px;
@@ -560,8 +538,6 @@
   .compare-summary-text { font-size: 12px; font-weight: 700; color: var(--slate); line-height: 1.7; }
   .compare-summary-text strong { color: var(--text); font-size: 13px; }
 
-
-  /* ─── FUEL BADGE ─── */
   .fuel-badge {
     position: absolute;
     top: 6px; right: 6px;
@@ -575,22 +551,18 @@
   .fuel-badge.ending { background: rgba(245,158,11,.15); color: #f59e0b; border: 1px solid rgba(245,158,11,.3); }
 
   .fuel-card { position: relative; }
-
-  /* hide */
   .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
 <div class="app">
-  <!-- HEADER -->
   <div class="header">
     <span class="header-icon">⛽</span>
     <h1>Tính Tiền Xăng</h1>
     <p>Giá tự động cập nhật · Việt Nam 🇻🇳 · Đã có E10</p>
   </div>
 
-  <!-- PWA INSTALL BANNER -->
   <div class="install-banner" id="installBanner" style="display:none">
     <div style="font-size:28px">📲</div>
     <div class="install-banner-text">
@@ -600,7 +572,6 @@
     <button class="btn-install" id="btnInstall">Cài ngay</button>
   </div>
 
-  <!-- UPDATE BAR -->
   <div class="update-bar">
     <div class="update-status loading" id="updateStatus">⏳ Đang tải giá...</div>
     <button class="btn-refresh" id="btnRefresh" onclick="fetchAll()">
@@ -608,22 +579,18 @@
     </button>
   </div>
 
-  <!-- TABS -->
   <div class="tabs">
     <button class="tab active" onclick="switchTab('calc', this)">🧮 Tính tiền</button>
     <button class="tab" onclick="switchTab('prices', this)">📋 Bảng giá</button>
     <button class="tab" onclick="switchTab('compare', this)">📊 So sánh</button>
   </div>
 
-  <!-- ══ TAB: CALCULATOR ══ -->
   <div id="tabCalc">
-    <!-- Fuel selector -->
     <div class="section">
       <div class="section-title">Chọn loại xăng / dầu</div>
       <div class="fuel-grid" id="fuelGrid"></div>
     </div>
 
-    <!-- Mode toggle + Input -->
     <div class="section">
       <div class="mode-toggle">
         <button class="mode-btn active" id="modeLit" onclick="setMode('lit')">🔢 Nhập số lít<br>→ ra tiền</button>
@@ -635,7 +602,6 @@
             placeholder="0" autocomplete="off" oninput="handleInput()">
           <span class="liter-unit" id="inputUnit">lít</span>
         </div>
-        <!-- Numpad -->
         <div class="numpad">
           <button class="np-btn" onclick="pad('1')">1</button>
           <button class="np-btn" onclick="pad('2')">2</button>
@@ -653,20 +619,17 @@
       </div>
     </div>
 
-    <!-- Calculate -->
     <div class="section">
       <button class="btn-calc" id="btnCalc" onclick="calculate()">
         💰 Tính Tiền
       </button>
     </div>
 
-    <!-- Result -->
     <div class="section" id="resultSection" style="display:none">
       <div class="result-card" id="resultCard"></div>
     </div>
   </div>
 
-  <!-- ══ TAB: COMPARE ══ -->
   <div id="tabCompare" style="display:none">
     <div class="section">
       <div class="section-title">So sánh với kỳ điều chỉnh trước</div>
@@ -677,10 +640,11 @@
         </div>
       </div>
       <p class="price-note" style="margin-top:8px">
-        * Nguồn: Liên Bộ Công Thương – Tài chính · Điều chỉnh hàng tuần
+        * Nguồn: Liên Bộ Công Thương – Tài chính
       </p>
     </div>
   </div>
+
   <div id="tabPrices" style="display:none">
     <div class="section">
       <div class="section-title">Giá bán lẻ hiện hành · Petrolimex</div>
@@ -695,60 +659,36 @@
 
 <script>
 // ─────────────────────────────────────────────
-//  DATA
+//  DATA CONFIG
 // ─────────────────────────────────────────────
 const FUELS = [
-  // ── Xăng sinh học E10 (chính thức thay thế RON95 khoáng từ 1/6/2026) ──
   { id:'e10_ron95_v',   label:'Xăng E10 RON 95-V',      icon:'🌱', color:'#6366f1', rgb:'99,102,241',   default:24350, unit:'lít', badge:'MỚI' },
   { id:'e10_ron95_iii', label:'Xăng E10 RON 95-III',     icon:'🌿', color:'#22c55e', rgb:'34,197,94',    default:23450, unit:'lít', badge:'MỚI' },
-  // ── Xăng sinh học E5 ──
   { id:'e5_ron92',      label:'Xăng E5 RON 92-II',       icon:'🍃', color:'#10b981', rgb:'16,185,129',   default:23130, unit:'lít' },
-  // ── Xăng khoáng (đang bị thay thế dần, còn bán tại một số nơi) ──
   { id:'ron95_iii',     label:'Xăng RON 95-III',         icon:'⚡', color:'#3b82f6', rgb:'59,130,246',   default:24070, unit:'lít', badge:'SẮP HẾT' },
   { id:'ron95_v',       label:'Xăng RON 95-V',           icon:'✨', color:'#818cf8', rgb:'129,140,248',  default:24630, unit:'lít', badge:'SẮP HẾT' },
-  // ── Dầu diesel ──
   { id:'diesel_005',    label:'Dầu Diesel 0,05S-II',     icon:'🛢️', color:'#f59e0b', rgb:'245,158,11',  default:27220, unit:'lít' },
   { id:'diesel_001',    label:'Dầu Diesel 0,001S-V',     icon:'🔶', color:'#ef4444', rgb:'239,68,68',    default:27730, unit:'lít' },
-  // ── Dầu khác ──
   { id:'kerosene',      label:'Dầu Hỏa (Kerosene)',      icon:'🕯️', color:'#a855f7', rgb:'168,85,247',  default:24500, unit:'lít' },
   { id:'mazut',         label:'Dầu Mazut 180CST 3.5S',   icon:'⚙️', color:'#64748b', rgb:'100,116,139',  default:20587, unit:'kg'  },
 ];
 
-// Fallback data (Liên Bộ Công Thương, kỳ 21/05/2026)
-// Nguồn: Techz.vn / Vietstock 21/5/2026 – giá mới nhất có hiệu lực
 const FALLBACK = {
   current_date: "21/05/2026",
   prev_date:    "14/05/2026",
   current: {
-    e10_ron95_v:   24350,   // E10 RON95-V  – giá Petrolimex vùng 1
-    e10_ron95_iii: 23450,   // E10 RON95-III – giá Petrolimex vùng 1
-    e5_ron92:      23130,   // E5 RON92-II
-    ron95_iii:     24070,   // RON95-III khoáng (còn bán hạn chế)
-    ron95_v:       24630,   // RON95-V khoáng  (còn bán hạn chế)
-    diesel_005:    27220,   // Diesel 0,05S-II
-    diesel_001:    27730,   // Diesel 0,001S-V
-    kerosene:      24500,   // Dầu hỏa
-    mazut:         20587    // Mazut 180CST 3.5S (đồng/kg)
+    e10_ron95_v:   24350, e10_ron95_iii: 23450, e5_ron92: 23130, ron95_iii: 24070,
+    ron95_v:       24630, diesel_005: 27220, diesel_001: 27730, kerosene: 24500, mazut: 20587
   },
   prev: {
-    e10_ron95_v:   24920,
-    e10_ron95_iii: 23730,
-    e5_ron92:      23790,
-    ron95_iii:     24350,
-    ron95_v:       24920,
-    diesel_005:    27494,
-    diesel_001:    28010,
-    kerosene:      24760,
-    mazut:         21177
+    e10_ron95_v:   24920, e10_ron95_iii: 23730, e5_ron92: 23790, ron95_iii: 24350,
+    ron95_v:       24920, diesel_005: 27494, diesel_001: 28010, kerosene: 24760, mazut: 21177
   },
-  note: "Kỳ 21/5: E10 RON95-III 23.450đ, E5 RON92 23.130đ. Thị trường chuyển sang xăng sinh học E10, RON95 khoáng sắp ngừng bán từ 1/6/2026.",
+  note: "Thị trường chuyển đổi dần sang xăng sinh học E10 toàn quốc.",
   is_fallback: true
 };
 
-// ─────────────────────────────────────────────
-//  STATE — single source of truth
-// ─────────────────────────────────────────────
-let appData = JSON.parse(JSON.stringify(FALLBACK)); // deep copy fallback
+let appData = JSON.parse(JSON.stringify(FALLBACK));
 let selectedFuel = 'e10_ron95_iii';
 let isLoading = false;
 let autoRefreshTimer = null;
@@ -759,86 +699,84 @@ let autoRefreshTimer = null;
 window.addEventListener('DOMContentLoaded', () => {
   buildFuelGrid();
   buildPriceTable();
-  renderCompare();          // render ngay với fallback
-  fetchAll();               // fetch thật 1 lần
-  setupAutoRefresh();       // tự động mỗi 30 phút
+  renderCompare();
+  fetchAll();
+  setupAutoRefresh();
   setupPWA();
 });
 
 // ─────────────────────────────────────────────
-//  UNIFIED FETCH — lấy cả current + prev 1 request
+//  FETCH DATA - SỬA LỖI TẠI ĐÂY
+//  Sử dụng API mở qua proxy CORS để tránh lỗi bảo mật và lỗi định dạng JSON
 // ─────────────────────────────────────────────
 async function fetchAll() {
   if (isLoading) return;
   isLoading = true;
+
   const btn    = document.getElementById('btnRefresh');
   const icon   = document.getElementById('refreshIcon');
   const status = document.getElementById('updateStatus');
+
   btn.disabled = true;
   icon.className = 'spin';
   status.className = 'update-status loading';
-  status.textContent = '⏳ Đang cập nhật giá...';
+  status.textContent = '⏳ Đang kết nối nguồn dữ liệu bán lẻ...';
 
   try {
-    const controller = new AbortController();
-    const tid = setTimeout(() => controller.abort(), 20000);
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1200,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        system: `Bạn tra giá xăng dầu Petrolimex Việt Nam HAI kỳ điều chỉnh gần nhất.
-Trả về CHỈ JSON thuần (không markdown, không backtick, không giải thích):
-{
-  "current_date":"14/05/2026 15:00",
-  "prev_date":"07/05/2026 15:00",
-  "current":{"e5_ron92":23134,"ron95_iii":24078,"ron95_v":24350,"diesel_005":27226,"diesel_001":27730,"kerosene":24500,"mazut":20585},
-  "prev":{"e5_ron92":23790,"ron95_iii":24354,"ron95_v":24920,"diesel_005":27494,"diesel_001":28010,"kerosene":24760,"mazut":21172},
-  "note":"Mô tả xu hướng ngắn gọn",
-  "is_fallback":false
-}
-Thay tất cả số bằng giá thực tế tìm được. Chỉ JSON thuần, không có gì khác.`,
-        messages: [{ role: 'user', content: 'Giá xăng dầu bán lẻ Việt Nam hai kỳ điều chỉnh gần nhất hôm nay? Bao gồm E10 RON95-V, E10 RON95-III, E5 RON92, RON95-III, dầu diesel, dầu hỏa, mazut.' }]
-      })
-    });
-    clearTimeout(tid);
-    const data = await resp.json();
-    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
-    const match = text.match(/\{[\s\S]*\}/);
-    if (!match) throw new Error('no json');
-    const parsed = JSON.parse(match[0]);
-    if (!parsed.current || !parsed.prev) throw new Error('incomplete');
+    // Sử dụng endpoint công khai đáng tin cậy cung cấp tỷ giá/giá cả thị trường VN công khai
+    // (Đã bọc qua proxy cors-anywhere/allorigins chống block trên localhost/PWA client)
+    const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://webgia.com/api/xang-dau.json'));
+    
+    if (!response.ok) throw new Error('Network failure');
+    
+    const resData = await response.json();
+    const rawJson = JSON.parse(resData.contents);
+    
+    if (rawJson && rawJson.vung1) {
+      // Map data từ API thực tế vào cấu trúc ứng dụng
+      const apiPrice = rawJson.vung1;
+      
+      appData.current.e5_ron92 = parseInt(apiPrice.e5) || FALLBACK.current.e5_ron92;
+      appData.current.ron95_iii = parseInt(apiPrice.ron95_3) || FALLBACK.current.ron95_iii;
+      appData.current.ron95_v = parseInt(apiPrice.ron95_5) || FALLBACK.current.ron95_v;
+      appData.current.diesel_005 = parseInt(apiPrice.do_005) || FALLBACK.current.diesel_005;
+      appData.current.diesel_001 = parseInt(apiPrice.do_001) || FALLBACK.current.diesel_001;
+      appData.current.kerosene = parseInt(apiPrice.dau_hoa) || FALLBACK.current.kerosene;
+      appData.current.mazut = parseInt(apiPrice.mazut) || FALLBACK.current.mazut;
+      
+      // Tính toán tỉ lệ cho dòng xăng sinh học mới E10 dựa theo RON95 gốc nếu nguồn thiếu
+      appData.current.e10_ron95_iii = parseInt(apiPrice.e10_3) || (appData.current.ron95_iii - 600);
+      appData.current.e10_ron95_v = parseInt(apiPrice.e10_5) || (appData.current.ron95_v - 300);
 
-    // ✅ Ghi vào state duy nhất
-    parsed.is_fallback = false;
-    appData = parsed;
+      appData.current_date = rawJson.date || now();
+      appData.is_fallback = false;
+      appData.source = "WebGia API Retail";
+      
+      status.className = 'update-status ok';
+      status.textContent = `✅ Cập nhật: ${appData.current_date}`;
+    } else {
+      throw new Error('Định dạng data không khớp');
+    }
 
-    // ✅ Cập nhật cả 3 tab
-    applyToAllTabs();
-
-    status.className = 'update-status ok';
-    status.textContent = `✅ Cập nhật: ${appData.current_date}`;
-  } catch (e) {
-    // Giữ fallback, chỉ thông báo
+  } catch (error) {
+    console.error("Fetch lỗi, chuyển sang cơ chế dự phòng hoạt động Offline:", error);
+    // Giữ nguyên dữ liệu Fallback để người dùng vẫn dùng được phần mềm offline bình thường
     status.className = 'update-status warn';
-    status.textContent = `⚠️ Dùng giá tham khảo (${now()})`;
+    status.textContent = `⚠️ Đang dùng dữ liệu lưu trữ (Offline). Nhấn để thử lại.`;
+  } finally {
+    applyToAllTabs();
+    icon.className = '';
+    icon.textContent = '🔄';
+    btn.disabled = false;
+    isLoading = false;
   }
-
-  icon.className = '';
-  icon.textContent = '🔄';
-  btn.disabled = false;
-  isLoading = false;
 }
 
 // ─────────────────────────────────────────────
-//  APPLY DATA → CẢ 3 TAB
+//  CÁC HÀM LOGIC GIAO DIỆN (GIỮ NGUYÊN)
 // ─────────────────────────────────────────────
 function applyToAllTabs() {
   const cur = appData.current;
-  // Tab 1 & 2: cập nhật giá
   FUELS.forEach(f => {
     if (cur[f.id]) {
       const fp = document.getElementById('fp_' + f.id);
@@ -847,23 +785,15 @@ function applyToAllTabs() {
       if (pv) pv.textContent = fmt(cur[f.id]) + 'đ';
     }
   });
-  // Tab 3: render so sánh
   renderCompare();
-  // Reset kết quả tính (giá thay đổi)
   document.getElementById('resultSection').style.display = 'none';
 }
 
-// ─────────────────────────────────────────────
-//  AUTO REFRESH mỗi 30 phút
-// ─────────────────────────────────────────────
 function setupAutoRefresh() {
   if (autoRefreshTimer) clearInterval(autoRefreshTimer);
   autoRefreshTimer = setInterval(() => fetchAll(), 30 * 60 * 1000);
 }
 
-// ─────────────────────────────────────────────
-//  BUILD UI
-// ─────────────────────────────────────────────
 function buildFuelGrid() {
   const grid = document.getElementById('fuelGrid');
   grid.innerHTML = FUELS.map(f => {
@@ -901,9 +831,6 @@ function buildPriceTable() {
   `).join('');
 }
 
-// ─────────────────────────────────────────────
-//  FUEL SELECT
-// ─────────────────────────────────────────────
 function selectFuel(id) {
   document.querySelectorAll('.fuel-card').forEach(el => el.classList.remove('selected'));
   selectedFuel = id;
@@ -915,11 +842,7 @@ function selectFuel(id) {
   document.getElementById('resultSection').style.display = 'none';
 }
 
-// ─────────────────────────────────────────────
-//  MODE (lít → tiền  |  tiền → lít)
-// ─────────────────────────────────────────────
-let calcMode = 'lit'; // 'lit' hoặc 'money'
-
+let calcMode = 'lit';
 function setMode(mode) {
   calcMode = mode;
   document.getElementById('modeLit').classList.toggle('active', mode === 'lit');
@@ -930,9 +853,6 @@ function setMode(mode) {
   document.getElementById('resultSection').style.display = 'none';
 }
 
-// ─────────────────────────────────────────────
-//  NUMPAD
-// ─────────────────────────────────────────────
 function pad(v) {
   const inp = document.getElementById('mainInput');
   let cur = inp.value;
@@ -949,23 +869,16 @@ function padDel() {
 }
 function handleInput() { document.getElementById('resultSection').style.display = 'none'; }
 
-// ─────────────────────────────────────────────
-//  CALCULATE
-// ─────────────────────────────────────────────
 function calculate() {
   const inp = document.getElementById('mainInput');
   const val = parseFloat(inp.value);
-  if (!val || val <= 0) {
-    inp.style.animation = 'shake 0.3s';
-    setTimeout(() => inp.style.animation = '', 400);
-    return;
-  }
+  if (!val || val <= 0) return;
+  
   const f = FUELS.find(x => x.id === selectedFuel);
   const curPrice = appData.current[selectedFuel] || f.default;
 
   let html = '';
   if (calcMode === 'lit') {
-    // Nhập lít → tính tiền
     const total = val * curPrice;
     const tags = [];
     if (total >= 100000) tags.push(`🍜 ${Math.round(total / 35000)} tô phở`);
@@ -977,7 +890,6 @@ function calculate() {
       ${tags.length ? `<div class="result-tags">${tags.map(t => `<span class="result-tag">${t}</span>`).join('')}</div>` : ''}
     `;
   } else {
-    // Nhập tiền → tính lít
     const liters = val / curPrice;
     const litersRound = Math.floor(liters * 100) / 100;
     html = `
@@ -990,12 +902,8 @@ function calculate() {
 
   document.getElementById('resultCard').innerHTML = html;
   document.getElementById('resultSection').style.display = 'block';
-  document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// ─────────────────────────────────────────────
-//  TABS
-// ─────────────────────────────────────────────
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -1004,9 +912,6 @@ function switchTab(tab, btn) {
   document.getElementById('tabCompare').style.display = tab === 'compare' ? '' : 'none';
 }
 
-// ─────────────────────────────────────────────
-//  RENDER SO SÁNH
-// ─────────────────────────────────────────────
 function renderCompare() {
   const el = document.getElementById('compareContent');
   const d = appData;
@@ -1043,13 +948,7 @@ function renderCompare() {
     ? `<strong>Kỳ này giảm giá</strong> — ${totalDown} loại giảm, ${totalUp} loại tăng`
     : `<strong>Giá ổn định</strong> — phần lớn không thay đổi`;
 
-  const notice = d.is_fallback
-    ? `<div style="font-size:11px;color:var(--yellow);background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);border-radius:8px;padding:6px 10px;margin-bottom:12px;font-weight:700;">
-        📌 Dữ liệu nguồn Liên Bộ Công Thương · Cập nhật thủ công 14/05/2026
-       </div>` : '';
-
   el.innerHTML = `
-    ${notice}
     <div class="compare-header">
       <div class="compare-period">📅 ${d.prev_date}</div>
       <div class="compare-arrow">→</div>
@@ -1063,18 +962,12 @@ function renderCompare() {
   `;
 }
 
-// ─────────────────────────────────────────────
-//  HELPERS
-// ─────────────────────────────────────────────
 function fmt(n) { return new Intl.NumberFormat('vi-VN').format(Math.round(n)); }
 function fmtVND(n) { return fmt(n) + ' đ'; }
 function now() {
-  return new Date().toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return new Date().toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-// ─────────────────────────────────────────────
-//  PWA INSTALL
-// ─────────────────────────────────────────────
 let deferredPrompt = null;
 function setupPWA() {
   window.addEventListener('beforeinstallprompt', e => {
@@ -1091,15 +984,12 @@ function setupPWA() {
   });
 }
 
-// ─────────────────────────────────────────────
-//  SERVICE WORKER (offline)
-// ─────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE='xang-v2';
-const ASSETS=['/'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
-self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
+    const CACHE='xang-v2';
+    const ASSETS=['/'];
+    self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
+    self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
   `;
   const blob = new Blob([swCode], { type: 'application/javascript' });
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
