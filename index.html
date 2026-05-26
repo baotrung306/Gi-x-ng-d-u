@@ -811,4 +811,194 @@ function buildFuelGrid() {
     <div class="fuel-card${f.id === selectedFuel ? ' selected' : ''}"
          id="fc_${f.id}"
          style="--fc:${f.color};--fc-bg:rgba(${f.rgb},0.1)"
-         onclick="select
+         onclick="selectFuel('${f.id}')">
+      ${badge}
+      <span class="fuel-icon">${f.icon}</span>
+      <div class="fuel-name">${f.label}</div>
+      <div class="fuel-price" id="fp_${f.id}">${fmt(f.default)}đ</div>
+    </div>`;
+  }).join('');
+}
+
+function buildPriceTable() {
+  const tbl = document.getElementById('priceTable');
+  tbl.innerHTML = FUELS.map(f => `
+    <div class="price-row">
+      <div class="price-row-left">
+        <div class="price-row-icon">${f.icon}</div>
+        <div>
+          <div class="price-row-name">${f.label}</div>
+          <div class="price-row-unit">đồng/${f.unit}</div>
+        </div>
+      </div>
+      <div class="price-row-val" id="pv_${f.id}" style="color:${f.color}">${fmt(f.default)}đ</div>
+    </div>
+  `).join('');
+}
+
+function selectFuel(id) {
+  document.querySelectorAll('.fuel-card').forEach(el => el.classList.remove('selected'));
+  selectedFuel = id;
+  const f = FUELS.find(x => x.id === id);
+  const card = document.getElementById('fc_' + id);
+  card.classList.add('selected');
+  card.style.setProperty('--fc', f.color);
+  card.style.setProperty('--fc-bg', `rgba(${f.rgb},0.1)`);
+  document.getElementById('resultSection').style.display = 'none';
+}
+
+let calcMode = 'lit';
+function setMode(mode) {
+  calcMode = mode;
+  document.getElementById('modeLit').classList.toggle('active', mode === 'lit');
+  document.getElementById('modeMoney').classList.toggle('active', mode === 'money');
+  document.getElementById('inputUnit').textContent = mode === 'lit' ? 'lít' : 'đ';
+  document.getElementById('btnCalc').textContent = mode === 'lit' ? '💰 Tính Tiền' : '⛽ Tính Số Lít';
+  document.getElementById('mainInput').value = '';
+  document.getElementById('resultSection').style.display = 'none';
+}
+
+function pad(v) {
+  const inp = document.getElementById('mainInput');
+  let cur = inp.value;
+  if (v === '.' && cur.includes('.')) return;
+  if (cur === '0' && v !== '.') cur = '';
+  if (cur.length >= 10) return;
+  inp.value = cur + v;
+  document.getElementById('resultSection').style.display = 'none';
+}
+function padDel() {
+  const inp = document.getElementById('mainInput');
+  inp.value = inp.value.slice(0, -1);
+  document.getElementById('resultSection').style.display = 'none';
+}
+function handleInput() { document.getElementById('resultSection').style.display = 'none'; }
+
+function calculate() {
+  const inp = document.getElementById('mainInput');
+  const val = parseFloat(inp.value);
+  if (!val || val <= 0) return;
+  
+  const f = FUELS.find(x => x.id === selectedFuel);
+  const curPrice = appData.current[selectedFuel] || f.default;
+
+  let html = '';
+  if (calcMode === 'lit') {
+    const total = val * curPrice;
+    const tags = [];
+    if (total >= 100000) tags.push(`🍜 ${Math.round(total / 35000)} tô phở`);
+    if (total >= 50000)  tags.push(`☕ ${Math.round(total / 25000)} ly cà phê`);
+    html = `
+      <div class="result-desc">${f.icon} ${val.toLocaleString('vi-VN')} lít · ${f.label}</div>
+      <div class="result-amount">${fmtVND(total)}</div>
+      <div class="result-unit-price">Đơn giá: ${fmt(curPrice)} đ/${f.unit}</div>
+      ${tags.length ? `<div class="result-tags">${tags.map(t => `<span class="result-tag">${t}</span>`).join('')}</div>` : ''}
+    `;
+  } else {
+    const liters = val / curPrice;
+    const litersRound = Math.floor(liters * 100) / 100;
+    html = `
+      <div class="result-desc">${f.icon} ${fmt(val)}đ · ${f.label}</div>
+      <div class="result-amount">${litersRound.toLocaleString('vi-VN', {minimumFractionDigits:2, maximumFractionDigits:2})} lít</div>
+      <div class="result-unit-price">Đơn giá: ${fmt(curPrice)} đ/${f.unit}</div>
+      <div class="result-tags"><span class="result-tag">🪣 ~${Math.floor(liters / 40 * 100)}% bình 40L</span></div>
+    `;
+  }
+
+  document.getElementById('resultCard').innerHTML = html;
+  document.getElementById('resultSection').style.display = 'block';
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tabCalc').style.display    = tab === 'calc'    ? '' : 'none';
+  document.getElementById('tabPrices').style.display  = tab === 'prices'  ? '' : 'none';
+  document.getElementById('tabCompare').style.display = tab === 'compare' ? '' : 'none';
+}
+
+function renderCompare() {
+  const el = document.getElementById('compareContent');
+  const d = appData;
+  let totalUp = 0, totalDown = 0;
+
+  const rows = FUELS.map(f => {
+    const cur = d.current[f.id];
+    const pre = d.prev[f.id];
+    if (!cur || !pre) return '';
+    const diff = cur - pre;
+    const pct = ((diff / pre) * 100).toFixed(2);
+    let cls, txt;
+    if (diff > 0)      { cls = 'up';   txt = `▲ +${fmt(diff)}đ (+${pct}%)`; totalUp++; }
+    else if (diff < 0) { cls = 'down'; txt = `▼ ${fmt(Math.abs(diff))}đ (${pct}%)`; totalDown++; }
+    else               { cls = 'flat'; txt = `— Không đổi`; }
+    return `
+      <div class="compare-row">
+        <div class="compare-row-top">
+          <span style="font-size:20px">${f.icon}</span>
+          <div class="compare-row-name">${f.label}</div>
+        </div>
+        <div class="compare-prices">
+          <span class="compare-old">${fmt(pre)}đ</span>
+          <span class="compare-new" style="color:${f.color}">${fmt(cur)}đ</span>
+        </div>
+        <div class="compare-badge ${cls}">${txt}</div>
+      </div>`;
+  }).join('');
+
+  const trendIcon = totalUp > totalDown ? '📈' : totalDown > totalUp ? '📉' : '➡️';
+  const trendText = totalUp > totalDown
+    ? `<strong>Kỳ này tăng giá</strong> — các mặt hàng đồng loạt tăng mạnh so với tuần trước.`
+    : totalDown > totalUp
+    ? `<strong>Kỳ này giảm giá</strong> — giảm áp lực đáng kể cho người dân`
+    : `<strong>Giá ổn định</strong> — phần lớn không thay đổi`;
+
+  el.innerHTML = `
+    <div class="compare-header">
+      <div class="compare-period">📅 Kỳ trước: ${d.prev_date}</div>
+      <div class="compare-arrow">→</div>
+      <div class="compare-period" style="border-color:rgba(249,115,22,0.3);color:var(--accent)">📅 Kỳ này: ${d.current_date}</div>
+    </div>
+    <div class="compare-summary">
+      <div class="compare-summary-icon">${trendIcon}</div>
+      <div class="compare-summary-text">${trendText}<br>${d.note ? `<span>${d.note}</span>` : ''}</div>
+    </div>
+    ${rows}
+  `;
+}
+
+function fmt(n) { return new Intl.NumberFormat('vi-VN').format(Math.round(n)); }
+function fmtVND(n) { return fmt(n) + ' đ'; }
+function now() {
+  return new Date().toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+let deferredPrompt = null;
+function setupPWA() {
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBanner').style.display = 'flex';
+  });
+  document.getElementById('btnInstall').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') document.getElementById('installBanner').style.display = 'none';
+    deferredPrompt = null;
+  });
+}
+
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE='xang-v3';
+    const ASSETS=['/'];
+    self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
+    self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+}
+</script>
+</body>
+</html>
