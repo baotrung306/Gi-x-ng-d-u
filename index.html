@@ -632,7 +632,7 @@
 
   <div id="tabCompare" style="display:none">
     <div class="section">
-      <div class="section-title">So sánh với kỳ điều chỉnh trước</div>
+      <div class="section-title">So sánh biến động giữa 2 kỳ gần nhất</div>
       <div id="compareContent">
         <div class="compare-loading">
           <span class="spin-big">⛽</span>
@@ -640,7 +640,7 @@
         </div>
       </div>
       <p class="price-note" style="margin-top:8px">
-        * Nguồn: Liên Bộ Công Thương – Tài chính
+        * Nguồn dữ liệu: Tổng hợp kỳ điều chỉnh Bộ Công Thương – Tài chính công bố
       </p>
     </div>
   </div>
@@ -662,30 +662,29 @@
 //  DATA CONFIG
 // ─────────────────────────────────────────────
 const FUELS = [
-  { id:'e10_ron95_v',   label:'Xăng E10 RON 95-V',      icon:'🌱', color:'#6366f1', rgb:'99,102,241',   default:25950, unit:'lít', badge:'MỚI' },
-  { id:'e10_ron95_iii', label:'Xăng E10 RON 95-III',     icon:'🌿', color:'#22c55e', rgb:'34,197,94',    default:25050, unit:'lít', badge:'MỚI' },
-  { id:'e5_ron92',      label:'Xăng E5 RON 92-II',       icon:'🍃', color:'#10b981', rgb:'16,185,129',   default:24340, unit:'lít' },
-  { id:'ron95_iii',     label:'Xăng RON 95-III',         icon:'⚡', color:'#3b82f6', rgb:'59,130,246',   default:25540, unit:'lít', badge:'SẮP HẾT' },
-  { id:'ron95_v',       label:'Xăng RON 95-V',           icon:'✨', color:'#818cf8', rgb:'129,140,248',  default:26440, unit:'lít', badge:'SẮP HẾT' },
-  { id:'diesel_005',    label:'Dầu Diesel 0,05S-II',     icon:'🛢️', color:'#f59e0b', rgb:'245,158,11',  default:28760, unit:'lít' },
-  { id:'diesel_001',    label:'Dầu Diesel 0,001S-V',     icon:'🔶', color:'#ef4444', rgb:'239,68,68',    default:30020, unit:'lít' },
-  { id:'kerosene',      label:'Dầu Hỏa (Kerosene)',      icon:'🕯️', color:'#a855f7', rgb:'168,85,247',  default:28360, unit:'lít' },
-  { id:'mazut',         label:'Dầu Mazut 180CST 3.5S',   icon:'⚙️', color:'#64748b', rgb:'100,116,139',  default:21483, unit:'kg'  },
+  { id:'e10_ron95_v',   label:'Xăng E10 RON 95-V',      icon:'🌱', color:'#6366f1', rgb:'99,102,241',   default:24350, unit:'lít', badge:'MỚI' },
+  { id:'e10_ron95_iii', label:'Xăng E10 RON 95-III',     icon:'🌿', color:'#22c55e', rgb:'34,197,94',    default:23450, unit:'lít', badge:'MỚI' },
+  { id:'e5_ron92',      label:'Xăng E5 RON 92-II',       icon:'🍃', color:'#10b981', rgb:'16,185,129',   default:23130, unit:'lít' },
+  { id:'ron95_iii',     label:'Xăng RON 95-III',         icon:'⚡', color:'#3b82f6', rgb:'59,130,246',   default:24070, unit:'lít', badge:'SẮP HẾT' },
+  { id:'ron95_v',       label:'Xăng RON 95-V',           icon:'✨', color:'#818cf8', rgb:'129,140,248',  default:24630, unit:'lít', badge:'SẮP HẾT' },
+  { id:'diesel_005',    label:'Dầu Diesel 0,05S-II',     icon:'🛢️', color:'#f59e0b', rgb:'245,158,11',  default:27220, unit:'lít' },
+  { id:'diesel_001',    label:'Dầu Diesel 0,001S-V',     icon:'🔶', color:'#ef4444', rgb:'239,68,68',    default:27730, unit:'lít' },
+  { id:'kerosene',      label:'Dầu Hỏa (Kerosene)',      icon:'🕯️', color:'#a855f7', rgb:'168,85,247',  default:24500, unit:'lít' },
+  { id:'mazut',         label:'Dầu Mazut 180CST 3.5S',   icon:'⚙️', color:'#64748b', rgb:'100,116,139',  default:20587, unit:'kg'  },
 ];
 
+// Fallback tĩnh phòng trường hợp mất mạng
 const FALLBACK = {
   current_date: "21/05/2026",
   prev_date:    "14/05/2026",
   current: {
-    e10_ron95_v: 25950, e10_ron95_iii: 25050, e5_ron92: 24340, ron95_iii: 25540,
-    ron95_v: 26440, diesel_005: 28760, diesel_001: 30020, kerosene: 28360, mazut: 21483
-  },
-  prev: {
     e10_ron95_v: 24350, e10_ron95_iii: 23450, e5_ron92: 23130, ron95_iii: 24070,
     ron95_v: 24630, diesel_005: 27220, diesel_001: 27730, kerosene: 24500, mazut: 20587
   },
-  note: "Giá xăng dầu tăng mạnh theo đợt điều chỉnh mới của Liên Bộ.",
-  is_fallback: true
+  prev: {
+    e10_ron95_v: 24920, e10_ron95_iii: 23730, e5_ron92: 23790, ron95_iii: 24350,
+    ron95_v: 24920, diesel_005: 27494, diesel_001: 28010, kerosene: 24760, mazut: 21177
+  }
 };
 
 let appData = JSON.parse(JSON.stringify(FALLBACK));
@@ -706,7 +705,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ─────────────────────────────────────────────
-//  FETCH DATA & AUTO CALCULATE PERIODS
+//  FETCH DỮ LIỆU LỊCH SỬ TỪ API PHÂN PHỐI ĐA KỲ
 // ─────────────────────────────────────────────
 async function fetchAll() {
   if (isLoading) return;
@@ -719,55 +718,57 @@ async function fetchAll() {
   btn.disabled = true;
   icon.className = 'spin';
   status.className = 'update-status loading';
-  status.textContent = '⏳ Đang kết nối nguồn dữ liệu bán lẻ...';
+  status.textContent = '⏳ Đang đồng bộ lịch sử điều chỉnh...';
 
   try {
-    const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://webgia.com/api/xang-dau.json'));
+    // Gọi API lưu trữ chuỗi thời gian phân phối của Petrolimex qua Proxy
+    const apiUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://webgia.com/api/xang-dau-lich-su.json');
+    const response = await fetch(apiUrl);
+    if (!response.ok) throw new Error('API Error');
     
-    if (!response.ok) throw new Error('Network failure');
+    const wrapper = await response.json();
+    const historyData = JSON.parse(wrapper.contents);
     
-    const resData = await response.json();
-    const rawJson = JSON.parse(resData.contents);
-    
-    if (rawJson && rawJson.vung1) {
-      const apiPrice = rawJson.vung1;
+    // Đảm bảo API trả về mảng danh sách lịch sử chứa ít nhất 2 phần tử gần nhất
+    if (historyData && historyData.length >= 2) {
+      const kyMoiNhat = historyData[0]; // Ví dụ: Kỳ 21/05
+      const kyLienKe  = historyData[1]; // Ví dụ: Kỳ 14/05
       
-      // Đổ dữ liệu kỳ cũ (Kỳ trước đó làm mốc so sánh) trước khi cập nhật kỳ mới
-      appData.prev = JSON.parse(JSON.stringify(appData.current));
-      appData.prev_date = appData.current_date;
+      // 1. Gán dữ liệu cho KỲ NÀY (Hiện tại)
+      appData.current_date = kyMoiNhat.date;
+      appData.current.e5_ron92 = parseInt(kyMoiNhat.vung1.e5);
+      appData.current.ron95_iii = parseInt(kyMoiNhat.vung1.ron95_3);
+      appData.current.ron95_v = parseInt(kyMoiNhat.vung1.ron95_5);
+      appData.current.diesel_005 = parseInt(kyMoiNhat.vung1.do_005);
+      appData.current.diesel_001 = parseInt(kyMoiNhat.vung1.do_001);
+      appData.current.kerosene = parseInt(kyMoiNhat.vung1.dau_hoa);
+      appData.current.mazut = parseInt(kyMoiNhat.vung1.mazut);
+      // Tính toán tỉ lệ dòng sinh học E10 kì hiện tại
+      appData.current.e10_ron95_iii = parseInt(kyMoiNhat.vung1.e10_3) || (appData.current.ron95_iii - 620);
+      appData.current.e10_ron95_v = parseInt(kyMoiNhat.vung1.e10_5) || (appData.current.ron95_v - 300);
 
-      // Cập nhật giá trị kỳ mới (Kỳ hiện hành vừa tải về)
-      appData.current.e5_ron92 = parseInt(apiPrice.e5) || FALLBACK.current.e5_ron92;
-      appData.current.ron95_iii = parseInt(apiPrice.ron95_3) || FALLBACK.current.ron95_iii;
-      appData.current.ron95_v = parseInt(apiPrice.ron95_5) || FALLBACK.current.ron95_v;
-      appData.current.diesel_005 = parseInt(apiPrice.do_005) || FALLBACK.current.diesel_005;
-      appData.current.diesel_001 = parseInt(apiPrice.do_001) || FALLBACK.current.diesel_001;
-      appData.current.kerosene = parseInt(apiPrice.dau_hoa) || FALLBACK.current.kerosene;
-      appData.current.mazut = parseInt(apiPrice.mazut) || FALLBACK.current.mazut;
-      
-      // Đồng bộ tính toán dòng xăng E10
-      appData.current.e10_ron95_iii = parseInt(apiPrice.e10_3) || (appData.current.ron95_iii - 490);
-      appData.current.e10_ron95_v = parseInt(apiPrice.e10_5) || (appData.current.ron95_v - 490);
+      // 2. Gán dữ liệu cho KỲ TRƯỚC GẦN NHẤT
+      appData.prev_date = kyLienKe.date;
+      appData.prev.e5_ron92 = parseInt(kyLienKe.vung1.e5);
+      appData.prev.ron95_iii = parseInt(kyLienKe.vung1.ron95_3);
+      appData.prev.ron95_v = parseInt(kyLienKe.vung1.ron95_5);
+      appData.prev.diesel_005 = parseInt(kyLienKe.vung1.do_005);
+      appData.prev.diesel_001 = parseInt(kyLienKe.vung1.do_001);
+      appData.prev.kerosene = parseInt(kyLienKe.vung1.dau_hoa);
+      appData.prev.mazut = parseInt(kyLienKe.vung1.mazut);
+      // Tính toán tỉ lệ dòng sinh học E10 kì trước
+      appData.prev.e10_ron95_iii = parseInt(kyLienKe.vung1.e10_3) || (appData.prev.ron95_iii - 620);
+      appData.prev.e10_ron95_v = parseInt(kyLienKe.vung1.e10_5) || (appData.prev.ron95_v - 300);
 
-      // Nếu dữ liệu cũ bị trùng lặp thời gian, tự động tính mốc dựa trên biên độ cố định kỳ gần nhất
-      if (appData.prev_date === (rawJson.date || now()) || appData.prev.ron95_iii === appData.current.ron95_iii) {
-        appData.prev_date = "14/05/2026";
-        appData.prev = JSON.parse(JSON.stringify(FALLBACK.prev));
-      }
-
-      appData.current_date = rawJson.date || "21/05/2026";
-      appData.is_fallback = false;
-      
       status.className = 'update-status ok';
-      status.textContent = `✅ Cập nhật: ${appData.current_date}`;
+      status.textContent = `✅ Cập nhật tự động: ${appData.current_date}`;
     } else {
-      throw new Error('Định dạng data không khớp');
+      throw new Error('Cấu trúc dữ liệu mảng lịch sử bị lỗi.');
     }
-
   } catch (error) {
-    console.error("Dùng dữ liệu local lưu trữ:", error);
-    status.className = 'update-status ok';
-    status.textContent = `✅ Đồng bộ: ${appData.current_date} (Chế độ xem tin)`;
+    console.warn("Lỗi API, chạy chế độ Offline cục bộ:", error);
+    status.className = 'update-status warn';
+    status.textContent = `⚠️ Offline - So sánh kỳ ${appData.prev_date} → ${appData.current_date}`;
   } finally {
     applyToAllTabs();
     icon.className = '';
@@ -778,7 +779,7 @@ async function fetchAll() {
 }
 
 // ─────────────────────────────────────────────
-//  INTERFACE & TABS CONTROL
+//  LOGIC RENDER GIAO DIỆN & TÍNH TOÁN
 // ─────────────────────────────────────────────
 function applyToAllTabs() {
   const cur = appData.current;
@@ -948,57 +949,10 @@ function renderCompare() {
 
   const trendIcon = totalUp > totalDown ? '📈' : totalDown > totalUp ? '📉' : '➡️';
   const trendText = totalUp > totalDown
-    ? `<strong>Kỳ này tăng giá</strong> — các mặt hàng đồng loạt tăng mạnh so với tuần trước.`
+    ? `<strong>Kỳ này xu hướng tăng</strong> — phần lớn các mặt hàng điều chỉnh đi lên.`
     : totalDown > totalUp
-    ? `<strong>Kỳ này giảm giá</strong> — giảm áp lực đáng kể cho người dân`
-    : `<strong>Giá ổn định</strong> — phần lớn không thay đổi`;
+    ? `<strong>Kỳ này xu hướng giảm</strong> — hạ nhiệt chi phí vận hành, đi lại.`
+    : `<strong>Giá bình ổn</strong> — không biến động nhiều so với tuần trước.`;
 
   el.innerHTML = `
-    <div class="compare-header">
-      <div class="compare-period">📅 Kỳ trước: ${d.prev_date}</div>
-      <div class="compare-arrow">→</div>
-      <div class="compare-period" style="border-color:rgba(249,115,22,0.3);color:var(--accent)">📅 Kỳ này: ${d.current_date}</div>
-    </div>
-    <div class="compare-summary">
-      <div class="compare-summary-icon">${trendIcon}</div>
-      <div class="compare-summary-text">${trendText}<br>${d.note ? `<span>${d.note}</span>` : ''}</div>
-    </div>
-    ${rows}
-  `;
-}
-
-function fmt(n) { return new Intl.NumberFormat('vi-VN').format(Math.round(n)); }
-function fmtVND(n) { return fmt(n) + ' đ'; }
-function now() {
-  return new Date().toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
-
-let deferredPrompt = null;
-function setupPWA() {
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    deferredPrompt = e;
-    document.getElementById('installBanner').style.display = 'flex';
-  });
-  document.getElementById('btnInstall').addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') document.getElementById('installBanner').style.display = 'none';
-    deferredPrompt = null;
-  });
-}
-
-if ('serviceWorker' in navigator) {
-  const swCode = `
-    const CACHE='xang-v3';
-    const ASSETS=['/'];
-    self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
-    self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
-  `;
-  const blob = new Blob([swCode], { type: 'application/javascript' });
-  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
-}
-</script>
-</body>
-</html>
+    <div class="compare-
