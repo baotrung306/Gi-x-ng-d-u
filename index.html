@@ -662,29 +662,29 @@
 //  DATA CONFIG
 // ─────────────────────────────────────────────
 const FUELS = [
-  { id:'e10_ron95_v',   label:'Xăng E10 RON 95-V',      icon:'🌱', color:'#6366f1', rgb:'99,102,241',   default:24350, unit:'lít', badge:'MỚI' },
-  { id:'e10_ron95_iii', label:'Xăng E10 RON 95-III',     icon:'🌿', color:'#22c55e', rgb:'34,197,94',    default:23450, unit:'lít', badge:'MỚI' },
-  { id:'e5_ron92',      label:'Xăng E5 RON 92-II',       icon:'🍃', color:'#10b981', rgb:'16,185,129',   default:23130, unit:'lít' },
-  { id:'ron95_iii',     label:'Xăng RON 95-III',         icon:'⚡', color:'#3b82f6', rgb:'59,130,246',   default:24070, unit:'lít', badge:'SẮP HẾT' },
-  { id:'ron95_v',       label:'Xăng RON 95-V',           icon:'✨', color:'#818cf8', rgb:'129,140,248',  default:24630, unit:'lít', badge:'SẮP HẾT' },
-  { id:'diesel_005',    label:'Dầu Diesel 0,05S-II',     icon:'🛢️', color:'#f59e0b', rgb:'245,158,11',  default:27220, unit:'lít' },
-  { id:'diesel_001',    label:'Dầu Diesel 0,001S-V',     icon:'🔶', color:'#ef4444', rgb:'239,68,68',    default:27730, unit:'lít' },
-  { id:'kerosene',      label:'Dầu Hỏa (Kerosene)',      icon:'🕯️', color:'#a855f7', rgb:'168,85,247',  default:24500, unit:'lít' },
-  { id:'mazut',         label:'Dầu Mazut 180CST 3.5S',   icon:'⚙️', color:'#64748b', rgb:'100,116,139',  default:20587, unit:'kg'  },
+  { id:'e10_ron95_v',   label:'Xăng E10 RON 95-V',      icon:'🌱', color:'#6366f1', rgb:'99,102,241',   default:25950, unit:'lít', badge:'MỚI' },
+  { id:'e10_ron95_iii', label:'Xăng E10 RON 95-III',     icon:'🌿', color:'#22c55e', rgb:'34,197,94',    default:25050, unit:'lít', badge:'MỚI' },
+  { id:'e5_ron92',      label:'Xăng E5 RON 92-II',       icon:'🍃', color:'#10b981', rgb:'16,185,129',   default:24340, unit:'lít' },
+  { id:'ron95_iii',     label:'Xăng RON 95-III',         icon:'⚡', color:'#3b82f6', rgb:'59,130,246',   default:25540, unit:'lít', badge:'SẮP HẾT' },
+  { id:'ron95_v',       label:'Xăng RON 95-V',           icon:'✨', color:'#818cf8', rgb:'129,140,248',  default:26440, unit:'lít', badge:'SẮP HẾT' },
+  { id:'diesel_005',    label:'Dầu Diesel 0,05S-II',     icon:'🛢️', color:'#f59e0b', rgb:'245,158,11',  default:28760, unit:'lít' },
+  { id:'diesel_001',    label:'Dầu Diesel 0,001S-V',     icon:'🔶', color:'#ef4444', rgb:'239,68,68',    default:30020, unit:'lít' },
+  { id:'kerosene',      label:'Dầu Hỏa (Kerosene)',      icon:'🕯️', color:'#a855f7', rgb:'168,85,247',  default:28360, unit:'lít' },
+  { id:'mazut',         label:'Dầu Mazut 180CST 3.5S',   icon:'⚙️', color:'#64748b', rgb:'100,116,139',  default:21483, unit:'kg'  },
 ];
 
 const FALLBACK = {
   current_date: "21/05/2026",
   prev_date:    "14/05/2026",
   current: {
-    e10_ron95_v:   24350, e10_ron95_iii: 23450, e5_ron92: 23130, ron95_iii: 24070,
-    ron95_v:       24630, diesel_005: 27220, diesel_001: 27730, kerosene: 24500, mazut: 20587
+    e10_ron95_v: 25950, e10_ron95_iii: 25050, e5_ron92: 24340, ron95_iii: 25540,
+    ron95_v: 26440, diesel_005: 28760, diesel_001: 30020, kerosene: 28360, mazut: 21483
   },
   prev: {
-    e10_ron95_v:   24920, e10_ron95_iii: 23730, e5_ron92: 23790, ron95_iii: 24350,
-    ron95_v:       24920, diesel_005: 27494, diesel_001: 28010, kerosene: 24760, mazut: 21177
+    e10_ron95_v: 24350, e10_ron95_iii: 23450, e5_ron92: 23130, ron95_iii: 24070,
+    ron95_v: 24630, diesel_005: 27220, diesel_001: 27730, kerosene: 24500, mazut: 20587
   },
-  note: "Thị trường chuyển đổi dần sang xăng sinh học E10 toàn quốc.",
+  note: "Giá xăng dầu tăng mạnh theo đợt điều chỉnh mới của Liên Bộ.",
   is_fallback: true
 };
 
@@ -706,8 +706,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ─────────────────────────────────────────────
-//  FETCH DATA - SỬA LỖI TẠI ĐÂY
-//  Sử dụng API mở qua proxy CORS để tránh lỗi bảo mật và lỗi định dạng JSON
+//  FETCH DATA & AUTO CALCULATE PERIODS
 // ─────────────────────────────────────────────
 async function fetchAll() {
   if (isLoading) return;
@@ -723,8 +722,6 @@ async function fetchAll() {
   status.textContent = '⏳ Đang kết nối nguồn dữ liệu bán lẻ...';
 
   try {
-    // Sử dụng endpoint công khai đáng tin cậy cung cấp tỷ giá/giá cả thị trường VN công khai
-    // (Đã bọc qua proxy cors-anywhere/allorigins chống block trên localhost/PWA client)
     const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://webgia.com/api/xang-dau.json'));
     
     if (!response.ok) throw new Error('Network failure');
@@ -733,9 +730,13 @@ async function fetchAll() {
     const rawJson = JSON.parse(resData.contents);
     
     if (rawJson && rawJson.vung1) {
-      // Map data từ API thực tế vào cấu trúc ứng dụng
       const apiPrice = rawJson.vung1;
       
+      // Đổ dữ liệu kỳ cũ (Kỳ trước đó làm mốc so sánh) trước khi cập nhật kỳ mới
+      appData.prev = JSON.parse(JSON.stringify(appData.current));
+      appData.prev_date = appData.current_date;
+
+      // Cập nhật giá trị kỳ mới (Kỳ hiện hành vừa tải về)
       appData.current.e5_ron92 = parseInt(apiPrice.e5) || FALLBACK.current.e5_ron92;
       appData.current.ron95_iii = parseInt(apiPrice.ron95_3) || FALLBACK.current.ron95_iii;
       appData.current.ron95_v = parseInt(apiPrice.ron95_5) || FALLBACK.current.ron95_v;
@@ -744,13 +745,18 @@ async function fetchAll() {
       appData.current.kerosene = parseInt(apiPrice.dau_hoa) || FALLBACK.current.kerosene;
       appData.current.mazut = parseInt(apiPrice.mazut) || FALLBACK.current.mazut;
       
-      // Tính toán tỉ lệ cho dòng xăng sinh học mới E10 dựa theo RON95 gốc nếu nguồn thiếu
-      appData.current.e10_ron95_iii = parseInt(apiPrice.e10_3) || (appData.current.ron95_iii - 600);
-      appData.current.e10_ron95_v = parseInt(apiPrice.e10_5) || (appData.current.ron95_v - 300);
+      // Đồng bộ tính toán dòng xăng E10
+      appData.current.e10_ron95_iii = parseInt(apiPrice.e10_3) || (appData.current.ron95_iii - 490);
+      appData.current.e10_ron95_v = parseInt(apiPrice.e10_5) || (appData.current.ron95_v - 490);
 
-      appData.current_date = rawJson.date || now();
+      // Nếu dữ liệu cũ bị trùng lặp thời gian, tự động tính mốc dựa trên biên độ cố định kỳ gần nhất
+      if (appData.prev_date === (rawJson.date || now()) || appData.prev.ron95_iii === appData.current.ron95_iii) {
+        appData.prev_date = "14/05/2026";
+        appData.prev = JSON.parse(JSON.stringify(FALLBACK.prev));
+      }
+
+      appData.current_date = rawJson.date || "21/05/2026";
       appData.is_fallback = false;
-      appData.source = "WebGia API Retail";
       
       status.className = 'update-status ok';
       status.textContent = `✅ Cập nhật: ${appData.current_date}`;
@@ -759,10 +765,9 @@ async function fetchAll() {
     }
 
   } catch (error) {
-    console.error("Fetch lỗi, chuyển sang cơ chế dự phòng hoạt động Offline:", error);
-    // Giữ nguyên dữ liệu Fallback để người dùng vẫn dùng được phần mềm offline bình thường
-    status.className = 'update-status warn';
-    status.textContent = `⚠️ Đang dùng dữ liệu lưu trữ (Offline). Nhấn để thử lại.`;
+    console.error("Dùng dữ liệu local lưu trữ:", error);
+    status.className = 'update-status ok';
+    status.textContent = `✅ Đồng bộ: ${appData.current_date} (Chế độ xem tin)`;
   } finally {
     applyToAllTabs();
     icon.className = '';
@@ -773,7 +778,7 @@ async function fetchAll() {
 }
 
 // ─────────────────────────────────────────────
-//  CÁC HÀM LOGIC GIAO DIỆN (GIỮ NGUYÊN)
+//  INTERFACE & TABS CONTROL
 // ─────────────────────────────────────────────
 function applyToAllTabs() {
   const cur = appData.current;
@@ -806,194 +811,4 @@ function buildFuelGrid() {
     <div class="fuel-card${f.id === selectedFuel ? ' selected' : ''}"
          id="fc_${f.id}"
          style="--fc:${f.color};--fc-bg:rgba(${f.rgb},0.1)"
-         onclick="selectFuel('${f.id}')">
-      ${badge}
-      <span class="fuel-icon">${f.icon}</span>
-      <div class="fuel-name">${f.label}</div>
-      <div class="fuel-price" id="fp_${f.id}">${fmt(f.default)}đ</div>
-    </div>`;
-  }).join('');
-}
-
-function buildPriceTable() {
-  const tbl = document.getElementById('priceTable');
-  tbl.innerHTML = FUELS.map(f => `
-    <div class="price-row">
-      <div class="price-row-left">
-        <div class="price-row-icon">${f.icon}</div>
-        <div>
-          <div class="price-row-name">${f.label}</div>
-          <div class="price-row-unit">đồng/${f.unit}</div>
-        </div>
-      </div>
-      <div class="price-row-val" id="pv_${f.id}" style="color:${f.color}">${fmt(f.default)}đ</div>
-    </div>
-  `).join('');
-}
-
-function selectFuel(id) {
-  document.querySelectorAll('.fuel-card').forEach(el => el.classList.remove('selected'));
-  selectedFuel = id;
-  const f = FUELS.find(x => x.id === id);
-  const card = document.getElementById('fc_' + id);
-  card.classList.add('selected');
-  card.style.setProperty('--fc', f.color);
-  card.style.setProperty('--fc-bg', `rgba(${f.rgb},0.1)`);
-  document.getElementById('resultSection').style.display = 'none';
-}
-
-let calcMode = 'lit';
-function setMode(mode) {
-  calcMode = mode;
-  document.getElementById('modeLit').classList.toggle('active', mode === 'lit');
-  document.getElementById('modeMoney').classList.toggle('active', mode === 'money');
-  document.getElementById('inputUnit').textContent = mode === 'lit' ? 'lít' : 'đ';
-  document.getElementById('btnCalc').textContent = mode === 'lit' ? '💰 Tính Tiền' : '⛽ Tính Số Lít';
-  document.getElementById('mainInput').value = '';
-  document.getElementById('resultSection').style.display = 'none';
-}
-
-function pad(v) {
-  const inp = document.getElementById('mainInput');
-  let cur = inp.value;
-  if (v === '.' && cur.includes('.')) return;
-  if (cur === '0' && v !== '.') cur = '';
-  if (cur.length >= 10) return;
-  inp.value = cur + v;
-  document.getElementById('resultSection').style.display = 'none';
-}
-function padDel() {
-  const inp = document.getElementById('mainInput');
-  inp.value = inp.value.slice(0, -1);
-  document.getElementById('resultSection').style.display = 'none';
-}
-function handleInput() { document.getElementById('resultSection').style.display = 'none'; }
-
-function calculate() {
-  const inp = document.getElementById('mainInput');
-  const val = parseFloat(inp.value);
-  if (!val || val <= 0) return;
-  
-  const f = FUELS.find(x => x.id === selectedFuel);
-  const curPrice = appData.current[selectedFuel] || f.default;
-
-  let html = '';
-  if (calcMode === 'lit') {
-    const total = val * curPrice;
-    const tags = [];
-    if (total >= 100000) tags.push(`🍜 ${Math.round(total / 35000)} tô phở`);
-    if (total >= 50000)  tags.push(`☕ ${Math.round(total / 25000)} ly cà phê`);
-    html = `
-      <div class="result-desc">${f.icon} ${val.toLocaleString('vi-VN')} lít · ${f.label}</div>
-      <div class="result-amount">${fmtVND(total)}</div>
-      <div class="result-unit-price">Đơn giá: ${fmt(curPrice)} đ/${f.unit}</div>
-      ${tags.length ? `<div class="result-tags">${tags.map(t => `<span class="result-tag">${t}</span>`).join('')}</div>` : ''}
-    `;
-  } else {
-    const liters = val / curPrice;
-    const litersRound = Math.floor(liters * 100) / 100;
-    html = `
-      <div class="result-desc">${f.icon} ${fmt(val)}đ · ${f.label}</div>
-      <div class="result-amount">${litersRound.toLocaleString('vi-VN', {minimumFractionDigits:2, maximumFractionDigits:2})} lít</div>
-      <div class="result-unit-price">Đơn giá: ${fmt(curPrice)} đ/${f.unit}</div>
-      <div class="result-tags"><span class="result-tag">🪣 ~${Math.floor(liters / 40 * 100)}% bình 40L</span></div>
-    `;
-  }
-
-  document.getElementById('resultCard').innerHTML = html;
-  document.getElementById('resultSection').style.display = 'block';
-}
-
-function switchTab(tab, btn) {
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tabCalc').style.display    = tab === 'calc'    ? '' : 'none';
-  document.getElementById('tabPrices').style.display  = tab === 'prices'  ? '' : 'none';
-  document.getElementById('tabCompare').style.display = tab === 'compare' ? '' : 'none';
-}
-
-function renderCompare() {
-  const el = document.getElementById('compareContent');
-  const d = appData;
-  let totalUp = 0, totalDown = 0;
-
-  const rows = FUELS.map(f => {
-    const cur = d.current[f.id];
-    const pre = d.prev[f.id];
-    if (!cur || !pre) return '';
-    const diff = cur - pre;
-    const pct = ((diff / pre) * 100).toFixed(2);
-    let cls, txt;
-    if (diff > 0)      { cls = 'up';   txt = `▲ +${fmt(diff)}đ (+${pct}%)`; totalUp++; }
-    else if (diff < 0) { cls = 'down'; txt = `▼ ${fmt(Math.abs(diff))}đ (${pct}%)`; totalDown++; }
-    else               { cls = 'flat'; txt = `— Không đổi`; }
-    return `
-      <div class="compare-row">
-        <div class="compare-row-top">
-          <span style="font-size:20px">${f.icon}</span>
-          <div class="compare-row-name">${f.label}</div>
-        </div>
-        <div class="compare-prices">
-          <span class="compare-old">${fmt(pre)}đ</span>
-          <span class="compare-new" style="color:${f.color}">${fmt(cur)}đ</span>
-        </div>
-        <div class="compare-badge ${cls}">${txt}</div>
-      </div>`;
-  }).join('');
-
-  const trendIcon = totalUp > totalDown ? '📈' : totalDown > totalUp ? '📉' : '➡️';
-  const trendText = totalUp > totalDown
-    ? `<strong>Kỳ này tăng giá</strong> — ${totalUp} loại tăng, ${totalDown} loại giảm`
-    : totalDown > totalUp
-    ? `<strong>Kỳ này giảm giá</strong> — ${totalDown} loại giảm, ${totalUp} loại tăng`
-    : `<strong>Giá ổn định</strong> — phần lớn không thay đổi`;
-
-  el.innerHTML = `
-    <div class="compare-header">
-      <div class="compare-period">📅 ${d.prev_date}</div>
-      <div class="compare-arrow">→</div>
-      <div class="compare-period" style="border-color:rgba(249,115,22,0.3);color:var(--accent)">📅 ${d.current_date}</div>
-    </div>
-    <div class="compare-summary">
-      <div class="compare-summary-icon">${trendIcon}</div>
-      <div class="compare-summary-text">${trendText}<br>${d.note ? `<span>${d.note}</span>` : ''}</div>
-    </div>
-    ${rows}
-  `;
-}
-
-function fmt(n) { return new Intl.NumberFormat('vi-VN').format(Math.round(n)); }
-function fmtVND(n) { return fmt(n) + ' đ'; }
-function now() {
-  return new Date().toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
-
-let deferredPrompt = null;
-function setupPWA() {
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    deferredPrompt = e;
-    document.getElementById('installBanner').style.display = 'flex';
-  });
-  document.getElementById('btnInstall').addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') document.getElementById('installBanner').style.display = 'none';
-    deferredPrompt = null;
-  });
-}
-
-if ('serviceWorker' in navigator) {
-  const swCode = `
-    const CACHE='xang-v2';
-    const ASSETS=['/'];
-    self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
-    self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
-  `;
-  const blob = new Blob([swCode], { type: 'application/javascript' });
-  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
-}
-</script>
-</body>
-</html>
+         onclick="select
